@@ -318,6 +318,68 @@
   flex-shrink: 0;
 }
 
+.todo-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  margin: 0.1rem 0 0 0;
+  border: 2px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-2);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.todo-checkbox:hover {
+  border-color: var(--primary);
+}
+
+.todo-checkbox:focus-visible {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.todo-checkbox:active {
+  transform: scale(0.9);
+}
+
+.todo-checkbox:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.todo-checkbox.checked {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.todo-checkbox-icon {
+  width: 16px;
+  height: 16px;
+  color: #fff;
+  pointer-events: none;
+  animation: check-pop 0.15s ease;
+}
+
+@keyframes check-pop {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .badge {
   font-size: 0.7rem;
   padding: 0.1rem 0.5rem;
