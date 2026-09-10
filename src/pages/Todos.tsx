@@ -22,11 +22,15 @@ export function Todos() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
 
-  const loadTodos = useCallback(async (pageNum: number) => {
+  const loadTodos = useCallback(async (pageNum: number, filterValue: 'all' | 'active' | 'completed') => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.get<{ todos: PaginatedTodos }>(`/todo?page=${pageNum}`);
+      const params = new URLSearchParams({ page: String(pageNum) });
+      if (filterValue === 'active') params.set('is_completed', '0');
+      if (filterValue === 'completed') params.set('is_completed', '1');
+
+      const data = await api.get<{ todos: PaginatedTodos }>(`/todo?${params.toString()}`);
       setTodos(data.todos.data);
       setPage(data.todos.current_page);
       setLastPage(data.todos.last_page);
@@ -38,8 +42,8 @@ export function Todos() {
   }, []);
 
   useEffect(() => {
-    loadTodos(1);
-  }, [loadTodos]);
+    loadTodos(1, filter);
+  }, [loadTodos, filter]);
 
   async function handleCreate(data: TodoFormData) {
     await api.post<{ todo: Todo }>('/todo/store', {
@@ -49,7 +53,7 @@ export function Todos() {
       due_at: data.due_at || null,
     });
     setShowForm(false);
-    loadTodos(page);
+    loadTodos(page, filter);
   }
 
   async function handleUpdate(id: number, data: TodoFormData) {
@@ -59,26 +63,20 @@ export function Todos() {
       priority: data.priority,
       due_at: data.due_at || null,
     });
-    loadTodos(page);
+    loadTodos(page, filter);
   }
 
   async function handleToggle(todo: Todo) {
     await api.post<{ todo: Todo }>(`/todo/update/${todo.id}`, {
       is_completed: !todo.is_completed,
     });
-    loadTodos(page);
+    loadTodos(page, filter);
   }
 
   async function handleDelete(id: number) {
     await api.delete(`/todo/destroy/${id}`);
-    loadTodos(page);
+    loadTodos(page, filter);
   }
-
-  const visibleTodos = todos.filter((t) => {
-    if (filter === 'active') return !t.is_completed;
-    if (filter === 'completed') return t.is_completed;
-    return true;
-  });
 
   return (
     <div className="todos-page">
@@ -119,11 +117,11 @@ export function Todos() {
 
       {loading ? (
         <div className="page-loading">Loading todos...</div>
-      ) : visibleTodos.length === 0 ? (
+      ) : todos.length === 0 ? (
         <div className="empty-state">No todos here. Add one to get started.</div>
       ) : (
         <ul className="todo-list">
-          {visibleTodos.map((todo) => (
+          {todos.map((todo) => (
             <TodoItem
               key={todo.id}
               todo={todo}
@@ -137,13 +135,13 @@ export function Todos() {
 
       {lastPage > 1 && (
         <div className="pagination">
-          <button disabled={page <= 1} onClick={() => loadTodos(page - 1)}>
+          <button disabled={page <= 1} onClick={() => loadTodos(page - 1, filter)}>
             Prev
           </button>
           <span>
             Page {page} of {lastPage}
           </span>
-          <button disabled={page >= lastPage} onClick={() => loadTodos(page + 1)}>
+          <button disabled={page >= lastPage} onClick={() => loadTodos(page + 1, filter)}>
             Next
           </button>
         </div>
