@@ -50,7 +50,7 @@ export function Todos() {
       title: data.title,
       description: data.description || null,
       priority: data.priority,
-      due_at: data.due_at || null,
+      due_at: data.due_at,
     });
     setShowForm(false);
     loadTodos(page, filter);
@@ -61,7 +61,7 @@ export function Todos() {
       title: data.title,
       description: data.description || null,
       priority: data.priority,
-      due_at: data.due_at || null,
+      due_at: data.due_at,
     });
     loadTodos(page, filter);
   }

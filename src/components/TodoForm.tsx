@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import type { Priority, Todo } from '../types';
+import { toUTCISOString, utcToLocalInputValue } from '../utils/date';
 
 interface TodoFormData {
   title: string;
   description: string;
   priority: Priority;
-  due_at: string;
+  due_at: string | null;
 }
 
 interface TodoFormProps {
@@ -19,7 +20,7 @@ export function TodoForm({ initial, submitLabel, onSubmit, onCancel }: TodoFormP
   const [title, setTitle] = useState(initial?.title ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
   const [priority, setPriority] = useState<Priority>(initial?.priority ?? 'medium');
-  const [dueAt, setDueAt] = useState(initial?.due_at ? initial.due_at.slice(0, 16) : '');
+  const [dueAt, setDueAt] = useState(utcToLocalInputValue(initial?.due_at ?? null));
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -28,7 +29,7 @@ export function TodoForm({ initial, submitLabel, onSubmit, onCancel }: TodoFormP
     setError(null);
     setSubmitting(true);
     try {
-      await onSubmit({ title, description, priority, due_at: dueAt });
+      await onSubmit({ title, description, priority, due_at: toUTCISOString(dueAt) });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {

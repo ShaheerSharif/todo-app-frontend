@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Priority, Todo } from '../types';
 import { TodoForm } from './TodoForm';
+import { formatDateTime } from '../utils/date';
 
 interface TodoFormData {
   title: string;
@@ -88,7 +89,7 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: TodoItemProps) 
         </div>
         {todo.description && <p className="todo-description">{todo.description}</p>}
         {todo.due_at && (
-          <span className="todo-due">Due {new Date(todo.due_at).toLocaleString()}</span>
+          <span className="todo-due">Due {formatDateTime(todo.due_at)}</span>
         )}
       </div>
 
